@@ -4,11 +4,14 @@ const fs = require('fs');
 
 async function scrapeImageUrls() {
     const baseUrl = 'https://verloren.de/found?page=';
+    const category = 'keys'
+    const title = 'Nothing Else Platforms'
+    const author = 'Max Mustermann'
     const markdownContent = [];
 
     for (let page = 1; page <= 10; page++) {
         try {
-            const { data } = await axios.get(`${baseUrl}${page}&category=keys`);
+            const { data } = await axios.get(`${baseUrl}${page}&category=${category}`);
             const $ = cheerio.load(data);
 
             $('.np-item__img-bg').each((i, element) => {
@@ -27,7 +30,8 @@ async function scrapeImageUrls() {
 
     // Write the Markdown content to a .md file
     const distinctMarkdownContent = [... new Set(markdownContent)];
-    fs.writeFileSync('image_urls.md', distinctMarkdownContent.join('\n'), 'utf8');
+    const header = '---\ntitle: "' + title + '"\nauthor: "' + author + '"\n---\n\n';
+    fs.writeFileSync('image_urls.md', header + distinctMarkdownContent.join('\n'), 'utf8');
     console.log(`Scraped ${markdownContent.length} image URLs and saved to image_urls.md`);
 }
 
